@@ -8,9 +8,9 @@ with iframe without iframe. Mostly, without iframe one is used, but if someday c
 All these codes are to be inputed into console when the video has been loaded. But console is very notorius in not being able to find any element in a webpage.
 For this you have to physically show the console where the element is. Here's a step by step procedure.
 
-#Steps 
+# Steps 
 
-##preparing the navigation.js
+## preparing the navigation.js
 1) you load the video, do ctrl + shift + i then ctrl + shift + c and hover over to the video (which highlights the video with blue box) and click it. 
 2) now run the first line of code in navigation.js (which is commented) and copy paste the result into the 2nd line , let time = 
 3) now do ctrl + shift + c and hover over to the dots on the bottom bar of h5p which represent the h5p quiz spots in the video, and then click it.
@@ -18,7 +18,7 @@ For this you have to physically show the console where the element is. Here's a 
 
 now that navigation.js is prepared, you can use to it jump to right before each h5p question.
 
-##navigating 
+## navigating 
 1) ctrl + shift + c, hover back to the video and click it (this is to help the console "see" the video)
 2) now run the navigator.
 3) voila ! you're on the first question (it'll take a second, chill)
