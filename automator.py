@@ -5,9 +5,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-# url = input("Enter the Moodle lecture URL: ")
-# username = input("Enter your Moodle username: ")
-# password = input("Enter your Moodle password: ")
+url = input("Enter the Moodle lecture URL: ")
+username = input("Enter your Moodle username: ")
+password = input("Enter your Moodle password: ")
 
 
 # Open the browser and navigate to the Moodle login page
