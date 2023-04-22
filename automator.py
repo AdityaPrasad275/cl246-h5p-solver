@@ -69,7 +69,7 @@ def operation(xpath, what_is_it, script_or_function_name):
         with open(script_or_function_name + '.js', 'r') as file:
             script = file.read()
 
-        return driver.execute_script(script + "; return" +  script_or_function_name + "()")
+        return driver.execute_script(script + "; return " +  script_or_function_name + "()")
     except TimeoutException:
         print("seekbar did not show up")
         exit()
@@ -101,7 +101,6 @@ try:
 except TimeoutException:
     print("video did not show up for measuring total time")
     exit()
-
 
 # # iterating through array of percentages
 # for percentage in percentages:

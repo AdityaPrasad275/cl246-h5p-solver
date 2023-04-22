@@ -1,4 +1,4 @@
-function percentage_extracter() {
+function percentage_extractor() {
   // Get the container div element
   const xpath = "/html/body/div/div/div[3]/div[2]/div[4]";
   const container = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
