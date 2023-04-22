@@ -24,6 +24,6 @@ const leftNumbers = leftValues.map(leftValue => {
     return valueWithoutPercentage / 100;
   });
   
-  // Now 'leftNumbers' contains an array of numbers instead of strings with percentages
-console.log(leftNumbers);
+// Now 'leftNumbers' contains an array of numbers instead of strings with percentages
+return leftNumbers;
   
