@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+import time
 
 url = input("Enter the Moodle lecture URL: ")
 username = input("Enter your Moodle username: ")
@@ -28,64 +29,75 @@ login_button.click()
 
 delay = 5
 
+def switchToFrame(id_or_class, status):
+    if status == "class":
+        try:
+            # Wait for the element with the ID of h5p-iframe
+            iframe = WebDriverWait(driver, delay).until(
+            EC.presence_of_element_located((By.CLASS_NAME, id_or_class))
+            )
+            print("iframe with class " + id_or_class + " is present in the DOM now")
 
-#switching to iframe
-try:
-    # Wait for the element with the ID of h5p-iframe
-    iframe = WebDriverWait(driver, delay).until(
-      EC.presence_of_element_located((By.CLASS_NAME, 'h5p-iframe'))
-    )
-    print("iframe is present in the DOM now")
-        
-    # Switch the driver's focus to the iframe
-    driver.switch_to.frame(iframe)
-except TimeoutException:
-    print("iframe did not show up")
-    exit()
+            # Switch the driver's focus to the iframe
+            driver.switch_to.frame(iframe)
+        except TimeoutException:
+            print("unable to switch to iframe with class " + id_or_class)
+            exit()
+    elif status == "id":
+        try:
+            # Wait for the element with the ID of h5p-iframe
+            iframe = WebDriverWait(driver, delay).until(
+            EC.presence_of_element_located((By.ID, id_or_class))
+            )
+            print("iframe with id " + id_or_class + " is present in the DOM now")
 
-#extracting percentages from seekbar
-try:
-    # Wait for the element with the xpath of h5p-content-interaction/seekbar 
-    seekbar = WebDriverWait(driver, delay).until(
-      EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div[3]/div[2]/div[4]'))
-    )
-    print("seekbar is present in the DOM now")
+            # Switch the driver's focus to the iframe
+            driver.switch_to.frame(iframe)
+        except TimeoutException:
+            print("unable to switch to iframe with id " + id_or_class)
+            exit()
 
-    # read percentage extractor.js
-    with open('percentage_extractor.js', 'r') as file:
-        script_pe = file.read()
+def operation(xpath, what_is_it, script_or_function_name):
+    try:
+        # Wait for the element with the xpath of h5p-content-interaction/seekbar 
+        seekbar = WebDriverWait(driver, delay).until(
+        EC.presence_of_element_located((By.XPATH, xpath))
+        )
+        print(what_is_it + " is present in the DOM now")
 
-    percentages = driver.execute_script(script_pe + "; return percentage_extracter()")
-except TimeoutException:
-    print("seekbar did not show up")
-    exit()
+        # read percentage extractor.js
+        with open(script_or_function_name + '.js', 'r') as file:
+            script = file.read()
 
+        return driver.execute_script(script + "; return" +  script_or_function_name + "()")
+    except TimeoutException:
+        print("seekbar did not show up")
+        exit()
 
+#switching to h5p iframe
+switchToFrame('h5p-iframe', "class")
+
+#extract percentages
+percentages = operation('/html/body/div/div/div[3]/div[2]/div[4]', 'seekbar', 'percentage_extractor')
+
+switchToFrame("h5p-youtube-0", "id")
 
 #finding total time
 try:
-    # Wait for the element with the ID of h5p-iframe
-    yt_iframe = WebDriverWait(driver, delay).until(
-      EC.presence_of_element_located((By.ID, 'h5p-youtube-0'))
-    )
-    print("yt iframe is present in the DOM now")
-
-    # Switch the driver's focus to the iframe
-    driver.switch_to.frame(yt_iframe)
-
-    # Wait for the element with the xpath of video 
+    # Find the video element
     video_stream = WebDriverWait(driver, delay).until(
         EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div[1]/video'))
-        )
-    print("video is present in the DOM now, finding total time")
+    )
+    # Click the "play" button using Selenium's .click() method
+    play_button = WebDriverWait(driver, delay).until(
+        EC.element_to_be_clickable((By.XPATH, '/html/body/div/div/div[4]/button'))
+    )
+    play_button.click()
 
-    totalTime = driver.execute_script("""
-        //const xpath = "/html/body/div/div/div[1]/video";
-        //const container = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        //return container.duration
-        document.querySelectorAll('.video-stream')[0].duration
-    """)
-    print(totalTime)
+    # Wait for the page to load
+    time.sleep(2) 
+
+    totalTime = video_stream.get_property('duration')
 except TimeoutException:
     print("video did not show up for measuring total time")
     exit()
@@ -96,7 +108,7 @@ except TimeoutException:
 #     try:
 #         # Wait for the element with the xpath of video stream
 #         video_stream = WebDriverWait(driver, delay).until(
-#         EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div[1]/video'))
+#           EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div[1]/video'))
 #         )
 #         print("video is present in the DOM now")
 
@@ -106,3 +118,4 @@ except TimeoutException:
 #     except TimeoutException:
 #         print("seekbar did not show up")
 #         exit()
+
