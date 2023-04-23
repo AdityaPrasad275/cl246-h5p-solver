@@ -12,7 +12,6 @@ url = input("Enter the Moodle lecture URL: ")
 username = input("Enter your Moodle username: ")
 password = input("Enter your Moodle password: ")
 
-
 # Open the browser and navigate to the Moodle login page
 driver = webdriver.Edge()
 driver.get(url)
@@ -23,8 +22,8 @@ functions.switchToFrame(driver, 'h5p-iframe', "class")
 time.sleep(1)
 
 #extract percentages
-percentages = functions.percentage_extractor(driver)
-print(percentages)
+question_stamps = functions.question_stamps(driver)
+print(question_stamps)
 
 functions.switchToFrame(driver, "h5p-youtube-0", "id")
 
@@ -55,36 +54,39 @@ driver.switch_to.default_content()
 functions.switchToFrame(driver, 'h5p-iframe', "class")
 
 # iterating through array of percentages
-for percentage in percentages:
+for question_stamp in question_stamps:
         
     driver.switch_to.default_content()
     functions.switchToFrame(driver, 'h5p-iframe', "class")
     functions.switchToFrame(driver, "h5p-youtube-0", "id")
 
-    print(totalTime*percentage)
     driver.execute_script("""
         const xpath = "/html/body/div/div/div[1]/video";
         const container = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
         container.currentTime = arguments[0]*arguments[1] - 2;
-    """, totalTime, percentage)
+    """, totalTime, question_stamp[0])
 
     driver.switch_to.default_content()
     #switching to h5p iframe
     functions.switchToFrame(driver, 'h5p-iframe', "class")
-
-    #finding to quiz_button
-    quiz_button = WebDriverWait(driver, delay).until(
-        EC.element_to_be_clickable((By.XPATH, '/html/body/div/div/div[2]/div[2]/div'))
-    )
-    print("quiz button is present in the DOM now")
-    quiz_button.click()
-
-    time.sleep(0.5)
     
-    #solving multiple choice multiple correct question (mcmc) 
-    functions.mcmc_solver(driver)
+    if question_stamp[1] == 'h5p-multichoice-interaction':
+        #finding to quiz_button
+        quiz_button = WebDriverWait(driver, delay).until(
+            EC.element_to_be_clickable((By.XPATH, '/html/body/div/div/div[2]/div[2]/div'))
+        )
+        print("quiz button is present in the DOM now")
+        quiz_button.click()
+
+        time.sleep(0.5)
+        functions.mcmc_solver(driver)
+    else:
+        time.sleep(4)
+        driver.execute_script("alert('I cannot solve this question do it yourself and submit and/or hit enter in the terminal where it asks to continue');")
+        input("CAUTION  !! make sure you have submitted the quiz and made its dialogue box and the purple quiz button dissapear before hitting enter here to continue: ")
+
 
 functions.aaaaaaaaand_submit(driver, totalTime)
 
-time.sleep(200)
+time.sleep(5)

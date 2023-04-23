@@ -84,7 +84,7 @@ def mcmc_solver(driver, delay = 5):
         print("options did not show up")
         exit()  
 
-def percentage_extractor(driver, delay = 5):
+def question_stamps(driver, delay = 5):
     try:
         # Wait for the element with the xpath of h5p-content-interaction/seekbar 
         seekbar = WebDriverWait(driver, delay).until(
@@ -103,20 +103,23 @@ def percentage_extractor(driver, delay = 5):
         # Get the width of the container element
         seekbar_width = seekbar.size['width']
 
-        # Create an empty array to store the percentages
-        percentages = []
+        # Create an empty list to store the percentage and question type pairs
+        percentage_question_type_pairs = []
 
         # Loop through the seekbar interactions and extract the percentage value from each element
         for interaction in seekbar_interactions:
             # Get the left value in pixels
             left_value_in_pixels = interaction.value_of_css_property('left')
+
             # Convert the left value to a percentage
             left_value_in_percentage = float(left_value_in_pixels[:-2]) / seekbar_width
-            # Append the percentage value to the array
-            percentages.append(left_value_in_percentage)
+
+            # Append the percentage value and corresponding question type in array
+            question_type = interaction.get_attribute('class').split()[-1]
+            percentage_question_type_pairs.append((left_value_in_percentage, question_type))
 
         # Now the percentages are stored in the 'percentages' array
-        return percentages
+        return percentage_question_type_pairs
     except TimeoutException:
         print("seekbar didnt show up")
         exit()
