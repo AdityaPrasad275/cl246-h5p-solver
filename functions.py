@@ -6,7 +6,7 @@ import time
 
 def login(driver, username, password):
     # Wait for the page to load
-    driver.implicitly_wait(2)
+    driver.implicitly_wait(1)
 
     # Find the username and password input fields, and enter your credentials
     input_username = driver.find_element(By.ID, "username")
@@ -43,23 +43,6 @@ def switchToFrame(driver, id_or_class, status, delay = 5):
         except TimeoutException:
             print("unable to switch to iframe with id " + id_or_class)
             exit()
-
-def operation(driver, xpath, what_is_it, script_or_function_name, delay = 5):
-    try:
-        # Wait for the element with the xpath of h5p-content-interaction/seekbar 
-        seekbar = WebDriverWait(driver, delay).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
-        print(what_is_it + " is present in the DOM now")
-
-        # read percentage extractor.js
-        with open(script_or_function_name + '.js', 'r') as file:
-            script = file.read()
-
-        return driver.execute_script(script + "; return " +  script_or_function_name + "()")
-    except TimeoutException:
-        print("seekbar did not show up")
-        exit()
 
 def mcmc_solver(driver, delay = 5):
     try:
@@ -100,3 +83,28 @@ def mcmc_solver(driver, delay = 5):
     except TimeoutException:
         print("options did not show up")
         exit()  
+
+def percentage_extractor(driver):
+    # Get the container element
+    container = driver.find_element(By.CLASS_NAME, "h5p-interactions-container")
+
+    # Get an array of all the child div elements with the class name 'h5p-seekbar-interaction'
+    seekbar_interactions = container.find_elements(By.CSS_SELECTOR, '.h5p-seekbar-interaction')
+
+    # Get the width of the container element
+    container_width = container.size['width']
+
+    # Create an empty array to store the percentages
+    percentages = []
+
+    # Loop through the seekbar interactions and extract the percentage value from each element
+    for interaction in seekbar_interactions:
+        # Get the left value in pixels
+        left_value_in_pixels = interaction.value_of_css_property('left')
+        # Convert the left value to a percentage
+        left_value_in_percentage = float(left_value_in_pixels[:-2]) / container_width
+        # Append the percentage value to the array
+        percentages.append(left_value_in_percentage)
+
+    # Now the percentages are stored in the 'percentages' array
+    return percentages

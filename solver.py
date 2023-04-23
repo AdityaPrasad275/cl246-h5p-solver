@@ -13,7 +13,7 @@ delay = 5
 # password = input("Enter your Moodle password: ")
 
 
-url = "https://moodle.iitb.ac.in/mod/hvp/view.php?id=103477"
+url = "https://moodle.iitb.ac.in/mod/hvp/view.php?id=103577"
 username = "210020007"
 password = "isDivergenceOfElectric0?"
 
@@ -24,9 +24,10 @@ functions.login(driver, username, password) #and login
 
 #switching to h5p iframe
 functions.switchToFrame(driver, 'h5p-iframe', "class")
+time.sleep(0.5)
 
 #extract percentages
-percentages = functions.operation(driver, '/html/body/div/div/div[3]/div[2]/div[4]', 'seekbar', 'percentage_extractor')
+percentages = functions.percentage_extractor(driver)
 print(percentages)
 
 functions.switchToFrame(driver, "h5p-youtube-0", "id")
