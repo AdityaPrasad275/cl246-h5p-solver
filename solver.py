@@ -13,7 +13,7 @@ delay = 5
 # password = input("Enter your Moodle password: ")
 
 
-url = "https://moodle.iitb.ac.in/mod/hvp/view.php?id=103577"
+url = "https://moodle.iitb.ac.in/mod/hvp/view.php?id=103579&forceview=1"
 username = "210020007"
 password = "isDivergenceOfElectric0?"
 
@@ -24,7 +24,7 @@ functions.login(driver, username, password) #and login
 
 #switching to h5p iframe
 functions.switchToFrame(driver, 'h5p-iframe', "class")
-time.sleep(0.5)
+time.sleep(1)
 
 #extract percentages
 percentages = functions.percentage_extractor(driver)
@@ -65,12 +65,6 @@ for percentage in percentages:
     functions.switchToFrame(driver, 'h5p-iframe', "class")
     functions.switchToFrame(driver, "h5p-youtube-0", "id")
 
-    # # Wait for the element with the xpath of video stream
-    # video_stream = WebDriverWait(driver, delay).until(
-    #     EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div[1]/video'))
-    # )
-    # print("video is present in the DOM now")
-
     print(totalTime*percentage)
     driver.execute_script("""
         const xpath = "/html/body/div/div/div[1]/video";
@@ -94,3 +88,7 @@ for percentage in percentages:
     
     #solving multiple choice multiple correct question (mcmc) 
     functions.mcmc_solver(driver)
+
+functions.aaaaaaaaand_submit(driver, totalTime)
+
+time.sleep(200)

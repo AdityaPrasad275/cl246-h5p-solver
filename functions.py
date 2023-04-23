@@ -46,7 +46,7 @@ def switchToFrame(driver, id_or_class, status, delay = 5):
 
 def mcmc_solver(driver, delay = 5):
     try:
-        # Wait for the element with the xpath of h5p-content-interaction/seekbar 
+        # Wait for the element with the xpath of options
         options = WebDriverWait(driver, delay).until(
             EC.presence_of_element_located((By.XPATH, "/html/body/div/div/div[5]/div/div[2]/div/div[2]/ul"))
         )
@@ -84,27 +84,63 @@ def mcmc_solver(driver, delay = 5):
         print("options did not show up")
         exit()  
 
-def percentage_extractor(driver):
-    # Get the container element
-    container = driver.find_element(By.CLASS_NAME, "h5p-interactions-container")
+def percentage_extractor(driver, delay = 5):
+    try:
+        # Wait for the element with the xpath of h5p-content-interaction/seekbar 
+        seekbar = WebDriverWait(driver, delay).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "h5p-interactions-container"))
+        )
+        print("skeebar are present in the DOM now")
 
-    # Get an array of all the child div elements with the class name 'h5p-seekbar-interaction'
-    seekbar_interactions = container.find_elements(By.CSS_SELECTOR, '.h5p-seekbar-interaction')
+        # Get an array of all the child div elements with the class name 'h5p-seekbar-interaction'
+        seekbar_interactions_temp = WebDriverWait(driver, delay).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '.h5p-seekbar-interaction'))
+        )
 
-    # Get the width of the container element
-    container_width = container.size['width']
+        # Get an array of all the child div elements with the class name 'h5p-seekbar-interaction'
+        seekbar_interactions = seekbar.find_elements(By.CSS_SELECTOR, '.h5p-seekbar-interaction')
 
-    # Create an empty array to store the percentages
-    percentages = []
+        # Get the width of the container element
+        seekbar_width = seekbar.size['width']
 
-    # Loop through the seekbar interactions and extract the percentage value from each element
-    for interaction in seekbar_interactions:
-        # Get the left value in pixels
-        left_value_in_pixels = interaction.value_of_css_property('left')
-        # Convert the left value to a percentage
-        left_value_in_percentage = float(left_value_in_pixels[:-2]) / container_width
-        # Append the percentage value to the array
-        percentages.append(left_value_in_percentage)
+        # Create an empty array to store the percentages
+        percentages = []
 
-    # Now the percentages are stored in the 'percentages' array
-    return percentages
+        # Loop through the seekbar interactions and extract the percentage value from each element
+        for interaction in seekbar_interactions:
+            # Get the left value in pixels
+            left_value_in_pixels = interaction.value_of_css_property('left')
+            # Convert the left value to a percentage
+            left_value_in_percentage = float(left_value_in_pixels[:-2]) / seekbar_width
+            # Append the percentage value to the array
+            percentages.append(left_value_in_percentage)
+
+        # Now the percentages are stored in the 'percentages' array
+        return percentages
+    except TimeoutException:
+        print("seekbar didnt show up")
+        exit()
+
+def aaaaaaaaand_submit(driver, totalTime, delay = 5):
+    #switching to yt iframe
+    driver.switch_to.default_content()
+    switchToFrame(driver, 'h5p-iframe', "class")
+    switchToFrame(driver, "h5p-youtube-0", "id")
+
+    driver.execute_script("""
+        const xpath = "/html/body/div/div/div[1]/video";
+        const container = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+        container.currentTime = arguments[0] - 1;
+    """, totalTime)
+
+    #switching to  h5p iframe
+    driver.switch_to.default_content()
+    switchToFrame(driver, 'h5p-iframe', "class")
+
+    #finding to quiz_button
+    submit_button = WebDriverWait(driver, delay).until(
+        EC.element_to_be_clickable((By.XPATH, '/html/body/div/div/div[9]/div[2]/div[2]/div/div[1]/div[2]/div[3]/button'))
+    )
+    print("submit button is present in the DOM now")
+    submit_button.click()
