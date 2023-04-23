@@ -8,14 +8,10 @@ import functions
 
 delay = 5
 
-# url = input("Enter the Moodle lecture URL: ")
-# username = input("Enter your Moodle username: ")
-# password = input("Enter your Moodle password: ")
+url = input("Enter the Moodle lecture URL: ")
+username = input("Enter your Moodle username: ")
+password = input("Enter your Moodle password: ")
 
-
-url = "https://moodle.iitb.ac.in/mod/hvp/view.php?id=103579&forceview=1"
-username = "210020007"
-password = "isDivergenceOfElectric0?"
 
 # Open the browser and navigate to the Moodle login page
 driver = webdriver.Edge()
