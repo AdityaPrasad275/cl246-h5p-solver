@@ -17,19 +17,39 @@ driver = webdriver.Edge()
 driver.get(url)
 functions.login(driver, username, password) #and login
 
-#switching to h5p iframe
-functions.switchToFrame(driver, 'h5p-iframe', "class")
+#list iframes
+# Wait for the element with the ID of h5p-iframe
+try:
+    h5p_iframe = WebDriverWait(driver, delay).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "h5p-iframe"))
+    )
+    driver.switch_to.frame(h5p_iframe)
+except TimeoutException:
+    print('iframe didnt show up in DOM, abort mission, fall back')
+    exit()
+
+try:
+    yt_iframe = WebDriverWait(driver, delay).until(
+        EC.presence_of_element_located((By.ID, "h5p-youtube-0"))
+    )
+except TimeoutException:
+    print("yt-iframe didn't show up in DOM, abort mission, fall back")
+    exit()
+driver.switch_to.default_content()
+
 time.sleep(1)
 
 #extract percentages
+driver.switch_to.frame(h5p_iframe)
 question_stamps = functions.question_stamps(driver)
 print(question_stamps)
 
-functions.switchToFrame(driver, "h5p-youtube-0", "id")
+time.sleep(0.5)
 
-#finding total time
+#playing the video
 try:
     # Find the video element
+    driver.switch_to.frame(yt_iframe)
     video_stream = WebDriverWait(driver, delay).until(
         EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div[1]/video'))
     )
@@ -38,27 +58,26 @@ try:
         EC.element_to_be_clickable((By.XPATH, '/html/body/div/div/div[4]/button'))
     )
     play_button.click()
-
-    # Wait for the page to load
-    time.sleep(1) 
-
-    totalTime = video_stream.get_property('duration')
 except TimeoutException:
     print("video did not show up for measuring total time")
     exit()
+
+# Wait for the page to load
+time.sleep(0.5) 
+
+#finding total time
+totalTime = video_stream.get_property('duration')
 print(totalTime)
 
-driver.switch_to.default_content()
-
 #switching to h5p iframe
-functions.switchToFrame(driver, 'h5p-iframe', "class")
+driver.switch_to.default_content()
+driver.switch_to.frame(h5p_iframe)
 
 # iterating through array of percentages
 for question_stamp in question_stamps:
-        
     driver.switch_to.default_content()
-    functions.switchToFrame(driver, 'h5p-iframe', "class")
-    functions.switchToFrame(driver, "h5p-youtube-0", "id")
+    driver.switch_to.frame(h5p_iframe)
+    driver.switch_to.frame(yt_iframe)
 
     driver.execute_script("""
         const xpath = "/html/body/div/div/div[1]/video";
@@ -66,10 +85,8 @@ for question_stamp in question_stamps:
 
         container.currentTime = arguments[0]*arguments[1] - 2;
     """, totalTime, question_stamp[0])
-
     driver.switch_to.default_content()
-    #switching to h5p iframe
-    functions.switchToFrame(driver, 'h5p-iframe', "class")
+    driver.switch_to.frame(h5p_iframe)
     
     if question_stamp[1] == 'h5p-multichoice-interaction':
         #finding to quiz_button
@@ -82,11 +99,11 @@ for question_stamp in question_stamps:
         time.sleep(0.5)
         functions.mcmc_solver(driver)
     else:
-        time.sleep(4)
-        driver.execute_script("alert('I cannot solve this question do it yourself and submit and/or hit enter in the terminal where it asks to continue');")
+        time.sleep(200)
+        driver.execute_script("alert('I cannot solve this question do it yourself and submit and/or hit enter in the terminal where it asks to continue (the code is stopped for 200 seconds)');")
         input("CAUTION  !! make sure you have submitted the quiz and made its dialogue box and the purple quiz button dissapear before hitting enter here to continue: ")
 
 
-functions.aaaaaaaaand_submit(driver, totalTime)
+functions.aaaaaaaaand_submit(driver, h5p_iframe, yt_iframe, totalTime)
 
 time.sleep(5)

@@ -17,33 +17,7 @@ def login(driver, username, password):
     # Find the login button and click it
     login_button = driver.find_element(By.XPATH, "//button[@type='submit']")
     login_button.click()
-
-def switchToFrame(driver, id_or_class, status, delay = 5):
-    if status == "class":
-        try:
-            # Wait for the element with the ID of h5p-iframe
-            iframe = WebDriverWait(driver, delay).until(
-                EC.presence_of_element_located((By.CLASS_NAME, id_or_class))
-            )
-            print("iframe with class " + id_or_class + " is present in the DOM now")
-            # Switch the driver's focus to the iframe
-            driver.switch_to.frame(iframe)
-        except TimeoutException:
-            print("unable to switch to iframe with class " + id_or_class)
-            exit()
-    elif status == "id":
-        try:
-            # Wait for the element with the ID of h5p-iframe
-            iframe = WebDriverWait(driver, delay).until(
-                EC.presence_of_element_located((By.ID, id_or_class))
-            )
-            print("iframe with id " + id_or_class + " is present in the DOM now")
-            # Switch the driver's focus to the iframe
-            driver.switch_to.frame(iframe)
-        except TimeoutException:
-            print("unable to switch to iframe with id " + id_or_class)
-            exit()
-
+    
 def mcmc_solver(driver, delay = 5):
     try:
         # Wait for the element with the xpath of options
@@ -124,11 +98,11 @@ def question_stamps(driver, delay = 5):
         print("seekbar didnt show up")
         exit()
 
-def aaaaaaaaand_submit(driver, totalTime, delay = 5):
+def aaaaaaaaand_submit(driver, h5p_iframe, yt_iframe, totalTime, delay = 5):
     #switching to yt iframe
     driver.switch_to.default_content()
-    switchToFrame(driver, 'h5p-iframe', "class")
-    switchToFrame(driver, "h5p-youtube-0", "id")
+    driver.switch_to.frame(h5p_iframe)
+    driver.switch_to.frame(yt_iframe)
 
     driver.execute_script("""
         const xpath = "/html/body/div/div/div[1]/video";
@@ -139,7 +113,7 @@ def aaaaaaaaand_submit(driver, totalTime, delay = 5):
 
     #switching to  h5p iframe
     driver.switch_to.default_content()
-    switchToFrame(driver, 'h5p-iframe', "class")
+    driver.switch_to.frame(h5p_iframe)
 
     #finding to quiz_button
     submit_button = WebDriverWait(driver, delay).until(
