@@ -99,8 +99,8 @@ for question_stamp in question_stamps:
         time.sleep(0.5)
         functions.mcmc_solver(driver)
     else:
-        time.sleep(200)
-        driver.execute_script("alert('I cannot solve this question do it yourself and submit and/or hit enter in the terminal where it asks to continue (the code is stopped for 200 seconds)');")
+        time.sleep(4)
+        driver.execute_script("alert('I cannot solve this question do it yourself and submit and/or hit enter in the terminal where it asks to continue (the code is stopped till you input)');")
         input("CAUTION  !! make sure you have submitted the quiz and made its dialogue box and the purple quiz button dissapear before hitting enter here to continue: ")
 
 
