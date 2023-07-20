@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import time	
-import functions
+import functions as fn
 
 delay = 5
 
@@ -15,7 +15,7 @@ password = input("Enter your Moodle password: ")
 # Open the browser and navigate to the Moodle login page
 driver = webdriver.Edge()
 driver.get(url)
-functions.login(driver, username, password) #and login
+fn.login(driver, username, password) #and login
 
 #list iframes
 # Wait for the element with the ID of h5p-iframe
@@ -41,7 +41,7 @@ time.sleep(1)
 
 #extract percentages
 driver.switch_to.frame(h5p_iframe)
-question_stamps = functions.question_stamps(driver)
+question_stamps = fn.question_stamps(driver)
 print(question_stamps)
 
 time.sleep(0.5)
@@ -97,13 +97,13 @@ for question_stamp in question_stamps:
         quiz_button.click()
 
         time.sleep(0.5)
-        functions.mcmc_solver(driver)
+        fn.mcmc_solver(driver)
     else:
         time.sleep(4)
         driver.execute_script("alert('I cannot solve this question do it yourself and submit and/or hit enter in the terminal where it asks to continue (the code is stopped till you input)');")
         input("CAUTION  !! make sure you have submitted the quiz and made its dialogue box and the purple quiz button dissapear before hitting enter here to continue: ")
 
 
-functions.aaaaaaaaand_submit(driver, h5p_iframe, yt_iframe, totalTime)
+fn.aaaaaaaaand_submit(driver, h5p_iframe, yt_iframe, totalTime)
 
 time.sleep(5)
