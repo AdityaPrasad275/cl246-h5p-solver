@@ -20,12 +20,6 @@ def login(driver, username, password):
     
 def mcmc_solver(driver, delay = 5):
     try:
-        # Wait for the element with the xpath of options
-        options = WebDriverWait(driver, delay).until(
-            EC.presence_of_element_located((By.XPATH, "/html/body/div/div/div[5]/div/div[2]/div/div[2]/ul"))
-        )
-        print("options are present in the DOM now")
-
         options = driver.find_elements(By.CSS_SELECTOR, '.h5p-answer')
 
         for option in options:
@@ -52,23 +46,22 @@ def mcmc_solver(driver, delay = 5):
         time.sleep(0.5)
         driver.find_element(By.CSS_SELECTOR, '.h5p-question-iv-continue').click()
         time.sleep(3)
-        driver.switch_to.default_content()
-
+        
+    
     except TimeoutException:
         print("options did not show up")
         exit()  
+        
+    # Wait until the element disappears from the DOM
+    wait = WebDriverWait(driver, 10)  # Adjust the timeout as needed (in seconds)
+    wait.until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '.h5p-interaction-button')))
+
 
 def question_stamps(driver, delay = 5):
     try:
         # Wait for the element with the xpath of h5p-content-interaction/seekbar 
         seekbar = WebDriverWait(driver, delay).until(
             EC.presence_of_element_located((By.CLASS_NAME, "h5p-interactions-container"))
-        )
-        print("skeebar are present in the DOM now")
-
-        # Get an array of all the child div elements with the class name 'h5p-seekbar-interaction'
-        seekbar_interactions_temp = WebDriverWait(driver, delay).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '.h5p-seekbar-interaction'))
         )
 
         # Get an array of all the child div elements with the class name 'h5p-seekbar-interaction'
@@ -92,32 +85,29 @@ def question_stamps(driver, delay = 5):
             question_type = interaction.get_attribute('class').split()[-1]
             percentage_question_type_pairs.append((left_value_in_percentage, question_type))
 
+        print(percentage_question_type_pairs)
         # Now the percentages are stored in the 'percentages' array
         return percentage_question_type_pairs
     except TimeoutException:
         print("seekbar didnt show up")
         exit()
 
-def aaaaaaaaand_submit(driver, h5p_iframe, yt_iframe, totalTime, delay = 5):
-    #switching to yt iframe
-    driver.switch_to.default_content()
-    driver.switch_to.frame(h5p_iframe)
-    driver.switch_to.frame(yt_iframe)
+def get_iframe(driver, delay):
+    h5p_iframe = driver.find_elements(By.TAG_NAME, 'iframe')
+    driver.switch_to.frame(h5p_iframe[0])
+ 
+    yt_iframe = driver.find_elements(By.TAG_NAME, 'iframe')
+    
+    return h5p_iframe[0], yt_iframe[0]
 
-    driver.execute_script("""
-        const xpath = "/html/body/div/div/div[1]/video";
-        const container = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-        container.currentTime = arguments[0] - 1;
-    """, totalTime)
-
-    #switching to  h5p iframe
-    driver.switch_to.default_content()
-    driver.switch_to.frame(h5p_iframe)
-
-    #finding to quiz_button
-    submit_button = WebDriverWait(driver, delay).until(
-        EC.element_to_be_clickable((By.XPATH, '/html/body/div/div/div[9]/div[2]/div[2]/div/div[1]/div[2]/div[3]/button'))
-    )
-    print("submit button is present in the DOM now")
-    submit_button.click()
+def play_video(driver, yt):
+    driver.switch_to.frame(yt)
+    driver.find_element(By.CLASS_NAME, 'ytp-large-play-button').click()
+    time.sleep(0.5)
+    
+    totalTime = driver.find_element(By.TAG_NAME, 'video').get_property('duration')
+    driver.switch_to.parent_frame()
+    
+    return totalTime
+    
+    
