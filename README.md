@@ -9,4 +9,5 @@ Just run `solver.py` , input your username, password and the URL for moodle lect
 Install selenium (python library) or any other library the terminal bugs you about
 
 # Demo video
+[Demo video](https://github.com/AdityaPrasad275/cl246-h5p-solver/assets/47395463/bdcc1db1-6b58-4b67-863c-534848254f12)
 
